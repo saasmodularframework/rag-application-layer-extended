@@ -1,14 +1,15 @@
 import SwiftUI
 
 enum Season: String, CaseIterable, Identifiable, Hashable {
-    case winter, spring, summer, autumn
+    case winter, spring, summer, autumn, vimeoBanner
     var id: String { rawValue }
     var task: String {
         switch self {
         case .winter: return "Robotic street snow remover"
-        case .spring: return "Robotic pouring of large exotic flowers"
+        case .spring: return "Robotic pouring of plants"
         case .summer: return "Robotic gardener designing a lawn"
-        case .autumn: return "Robotic sorting of fruit by size, shape, colour, weight"
+        case .autumn: return "Robotic sorting of fruits"
+        case .vimeoBanner: return "Video showcase presentation"
         }
     }
     var sky: UIColor {
@@ -17,6 +18,7 @@ enum Season: String, CaseIterable, Identifiable, Hashable {
         case .spring: return UIColor(red: 0.45, green: 0.55, blue: 0.62, alpha: 1)
         case .summer: return UIColor(red: 0.35, green: 0.65, blue: 0.95, alpha: 1)
         case .autumn: return UIColor(red: 0.85, green: 0.62, blue: 0.38, alpha: 1)
+        case .vimeoBanner: return UIColor(red: 0.1, green: 0.1, blue: 0.15, alpha: 1)
         }
     }
     var ground: UIColor {
@@ -25,6 +27,7 @@ enum Season: String, CaseIterable, Identifiable, Hashable {
         case .spring: return UIColor(red: 0.2, green: 0.5, blue: 0.25, alpha: 1)
         case .summer: return UIColor(red: 0.3, green: 0.65, blue: 0.2, alpha: 1)
         case .autumn: return UIColor(red: 0.5, green: 0.32, blue: 0.15, alpha: 1)
+        case .vimeoBanner: return UIColor.darkGray
         }
     }
 }
@@ -37,4 +40,5 @@ let charts = [
     Chart(id: 1, title: "2. Dendrogram: semantic proximity", asset: "2_dendrogram", season: .spring),
     Chart(id: 2, title: "3. Stream graph: mix vs post length", asset: "3_streamgraph", season: .summer),
     Chart(id: 3, title: "4. Radial bars: precision@K and F1", asset: "4_radial_bars", season: .autumn),
+    Chart(id: 4, title: "Video Showcase", asset: "video", season: .vimeoBanner)
 ]

@@ -69,10 +69,10 @@ back from `/api/*`.
 graph TB
   subgraph iPad["iPad — SwiftUI Client"]
     Motion["MotionManager<br/>CoreMotion device roll"]
-    Scene["DashboardScene — SceneKit<br/>skyline / fountain / dashboard node"]
+    Scene["SeasonScene — SceneKit<br/>Winter / Spring / Summer / Autumn scenes"]
     Panel["DashboardPanelView<br/>ingest + ask UI"]
     API["APIClient<br/>URLSession async/await"]
-    Video["PosterVideoBillboard<br/>WKWebView → Vimeo background embed"]
+    Video["VimeoPlayerView<br/>WKWebView → Vimeo embed"]
   end
 
   subgraph Vercel["ai-application-layer — Node.js / Express on Vercel"]
@@ -95,7 +95,7 @@ graph TB
   Index --> Dataset --> HF
   Index --> Vectorstore --> Chroma
   Index --> Gemma --> GoogleAI
-  Video -- "background=1&autoplay=1&loop=1&muted=1" --> VimeoCDN
+  Video -- "autoplay=1&title=0&byline=0" --> VimeoCDN
 ```
 
 | Layer | Contract | Why it's isolated this way |
@@ -104,7 +104,7 @@ graph TB
 | Node ↔ Hugging Face | `datasets-server` REST `rows` endpoint, filtered client-side to `label == 3` (Sci/Tech) | No dataset is bundled with either the backend or the SwiftUI app — articles are fetched live on each ingest call |
 | Node ↔ Chroma | LlamaIndex.TS `SentenceSplitter` chunks → `ai-sdk embed()` (`text-embedding-004`) → Chroma upsert/query | Embeddings and chunking stay entirely server-side; the SwiftUI app never sees raw vectors, only the final ranked `sources[]` |
 | Node ↔ Gemma | `ai-sdk generateText()` against Google AI Studio's Generative Language API | Swappable model id (`GEMMA_MODEL` env var) without any client-side change |
-| SwiftUI ↔ Vimeo | Direct `WKWebView` load of `player.vimeo.com/video/{id}?background=1` | Video playback is entirely client-side and unrelated to the RAG backend |
+| SwiftUI ↔ Vimeo | Direct `WKWebView` load of `player.vimeo.com/video/{id}??autoplay=1` | Video playback is entirely client-side and unrelated to the RAG backend |
 
 ---
 
@@ -176,6 +176,7 @@ the SwiftUI app only ever sees the final `answer`/`sources` JSON.
 │   ├── OfficeBuilder.swift             # SceneKit 3D environment & workstation builder
 │   ├── SceneHelpers.swift              # Material generation and lighting setup helpers
 │   ├── SeasonScene.swift               # Season-specific SceneContainer wrapper and views
+│   ├── VimeoPlayerView.swift           # WKWebView wrapper for embedded streaming
 │   ├── DashboardPanelView.swift        # Ingest + Ask UI, wired to APIClient
 │   └── APIClient.swift                 # async/await client for /api/health, /api/ingest, /api/query
 └── README.md
@@ -208,6 +209,7 @@ Backend repository (consumed, not vendored — see [ai-application-layer](https:
 | Spring weather scene | Spring season featuring falling rain and a robotic arm pouring water on flowers |
 | Summer weather scene | Summer environment featuring gentle wind currents and a robotic gardener designing and tending lawns |
 | Autumn weather scene | Autumn setting featuring flowing leaves and a robotic sorting mechanism separating fruit by size, shape, color, and weight |
+| Video Showcase presentation | Integrated WebKit video player streaming hosted content directly via Vimeo playback integratio |
 | Ingest + Ask Gemma | `DashboardPanelView` mirrors web functionality against the real `/api/ingest` and `/api/query` backend endpoints |
 
 ---

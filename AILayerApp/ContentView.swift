@@ -1,5 +1,6 @@
 import SwiftUI
 import SceneKit
+import WebKit
 
 struct ContentView: View {
     @State private var path: [Season] = []
@@ -11,7 +12,6 @@ struct ContentView: View {
     var body: some View {
         NavigationStack(path: $path) {
             ZStack {
-
                 SceneContainer(scene: OfficeBuilder.make(), allowsControl: false)
                     .ignoresSafeArea()
                 
@@ -24,8 +24,8 @@ struct ContentView: View {
                         chartImage
                             .scaleEffect(zoom)
                             .frame(minWidth: 0, minHeight: 0)
-                            .onTapGesture { 
-                                path.append(chart.season) 
+                            .onTapGesture {
+                                path.append(chart.season)
                             }
                     }
                     .frame(maxHeight: .infinity)
@@ -34,7 +34,6 @@ struct ContentView: View {
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.8))
                     
-                  
                     HStack(spacing: 20) {
                         btn("chevron.left") { step(-1) }
                         btn("minus.magnifyingglass") { zoom = max(0.5, zoom - 0.25) }
@@ -42,13 +41,12 @@ struct ContentView: View {
                         btn("chevron.right") { step(1) }
                     }
                     
-                    
-                    HStack { 
+                    HStack {
                         ForEach(charts) { c in
                             Circle()
                                 .fill(c.id == index ? .white : .white.opacity(0.3))
-                                .frame(width: 8, height: 8) 
-                        } 
+                                .frame(width: 8, height: 8)
+                        }
                     }
                 }
                 .padding(14)
@@ -63,24 +61,32 @@ struct ContentView: View {
                 )
             }
             .navigationDestination(for: Season.self) { season in
-                SeasonScene(season: season)
+                if season == .vimeoBanner {
+                    ZStack {
+                        Color.black.ignoresSafeArea()
+                        VimeoPlayerView(videoID: "1231812069")
+                            .ignoresSafeArea()
+                    }
+                } else {
+                    SeasonScene(season: season)
+                }
             }
         }
         .preferredColorScheme(.dark)
     }
     
-    func step(_ d: Int) { 
-        withAnimation(.easeInOut) { 
+    func step(_ d: Int) {
+        withAnimation(.easeInOut) {
             index = (index + d + charts.count) % charts.count
-            zoom = 1 
-        } 
+            zoom = 1
+        }
     }
     
     func btn(_ icon: String, _ action: @escaping () -> Void) -> some View {
-        Button(action: action) { 
+        Button(action: action) {
             Image(systemName: icon)
                 .font(.title3)
-                .frame(width: 44, height: 36) 
+                .frame(width: 44, height: 36)
         }
         .buttonStyle(.borderedProminent)
     }
@@ -93,9 +99,9 @@ struct ContentView: View {
         } else {
             AsyncImage(url: URL(string: "https://ai-application-layer-extended.vercel.app")) { image in
                 image.resizable().scaledToFit()
-            } placeholder: { 
+            } placeholder: {
                 Text("Add \(chart.asset).png to asset catalog")
-                    .foregroundColor(.secondary) 
+                    .foregroundColor(.secondary)
             }
         }
     }

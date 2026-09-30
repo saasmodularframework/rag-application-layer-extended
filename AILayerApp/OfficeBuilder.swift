@@ -5,11 +5,11 @@ enum OfficeBuilder {
     static func make() -> SCNScene {
         let s = SCNScene(); light(s, sun: 900)
         s.background.contents = UIColor(white: 0.08, alpha: 1)
-        let W: CGFloat = 16, D: CGFloat = 10, H: CGFloat = 8   // H = two storeys
+        let W: CGFloat = 16, D: CGFloat = 10, H: CGFloat = 8  
         s.rootNode.addChildNode(node(SCNBox(width: W, height: 0.1, length: D, chamferRadius: 0), UIColor(red: 0.45, green: 0.32, blue: 0.2, alpha: 1), SCNVector3(0, 0, 0)))
         s.rootNode.addChildNode(node(SCNBox(width: W, height: 0.1, length: D, chamferRadius: 0), UIColor(white: 0.9, alpha: 1), SCNVector3(0, Float(H), 0)))
         s.rootNode.addChildNode(node(SCNBox(width: W, height: H, length: 0.1, chamferRadius: 0), UIColor(white: 0.85, alpha: 1), SCNVector3(0, Float(H/2), Float(-D/2))))
-        // big stained-glass windows on the back wall
+
         let glass: [UIColor] = [.systemRed, .systemBlue, .systemYellow, .systemGreen, .systemPurple, .systemOrange]
         for i in 0..<6 {
             let w = node(SCNBox(width: 2, height: 6, length: 0.05, chamferRadius: 0.05), glass[i].withAlphaComponent(0.85),
@@ -19,7 +19,7 @@ enum OfficeBuilder {
                             SCNVector3(Float(-6.5 + Double(i) * 2.6), 7.2, Float(-D/2 + 0.1)), emissive: true)
             arch.eulerAngles.x = .pi / 2; s.rootNode.addChildNode(arch)
         }
-        // long tables + 12 computers: cols of 4 = two rows x two items
+
         let os: [(String, UIColor)] = [("mac", UIColor(red: 0.6, green: 0.75, blue: 1, alpha: 1)),
                                        ("linux", UIColor(red: 0.95, green: 0.45, blue: 0.15, alpha: 1)),
                                        ("windows", UIColor(red: 0.1, green: 0.5, blue: 0.95, alpha: 1))]

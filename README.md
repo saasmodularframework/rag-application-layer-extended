@@ -1,11 +1,10 @@
-# AI Application Layer — SwiftUI Smart Supply Chain Optimization Dashboard Dashboard
+# AI Application Layer — SwiftUI Smart Supply Chain Optimization Dashboard
 
 A SwiftUI + SceneKit iPad client for the **ai-application-layer** Gemma RAG
 backend, staged as an interactive 3D Smart Supply Chain Optimization Dashboard — motion-tilt parallax,
-a day/afternoon/night skyline, a stone-paved plaza, and a poster that turns
-into a looping video while the tablet is in motion. Under the hood it calls
-the exact same **Node.js / Express** API — `https://ai-application-layer.vercel.app`,
-source at [`techplanshetyapps/ai-application-layer`](https://github.com/techplanshetyapps/ai-application-layer-extended) —
+four seasonal 3D nature weather scenes (Winter with snow, Spring with rain and robotic flower-pouring, Summer with wind and robotic lawn-design, and Autumn with flowing leaves and robotic fruit-sorting). Under the hood it calls
+the exact same **Node.js / Express** API — `https://ai-application-layer-extended.vercel.app`,
+source at [`saasmodularframework/ai-application-layer-extended`](https://github.com/saasmodularframework/ai-application-layer-extended) —
 which ingests only the **Sci/Tech** slice of the AG News dataset directly from
 Hugging Face, indexes it in **ChromaDB** using **LlamaIndex.TS** for chunking,
 and answers questions about the articles using a **Gemma** model called
@@ -49,9 +48,8 @@ through the **Vercel AI SDK (ai-sdk)**.
 
 *   **Client platform:** macOS Ventura 16.7.8, Xcode 15.2, Apple Configurator
 *   **UI framework:** SwiftUI (declarative views, `@StateObject`/`@State` reactivity)
-*   **3D scene:** SceneKit — procedural skyscrapers, dashboard panel node, fountain particle system
+*   **3D scene:** SceneKit — four seasonal 3D nature weather scenes (Winter with snow, Spring with rain and robotic flower-pouring, Summer with wind and robotic lawn-design, Autumn with flowing leaves and robotic fruit-sorting)
 *   **Motion input:** CoreMotion (`CMMotionManager`) — device roll drives scene lean + parallax
-*   **Video embed:** WKWebView loading Vimeo's `player.vimeo.com` background-mode embed (muted, looping, autoplay)
 *   **Networking:** `URLSession` (async/await) against the deployed Node.js API
 *   **Deployment target:** iPadOS/iOS, distributed as a signed `.ipa` for installation via Apple Configurator 2 (not App Store)
 
@@ -112,11 +110,11 @@ graph TB
 
 ### SwiftUI client layer
 
-- **`MotionManager`** — reads `CMDeviceMotion.attitude.roll`, low-pass filters it into `leanAngle`, and derives a boolean `isMoving` from the rate of change. This one signal drives three separate visual effects: the 3D scene's camera/dashboard lean, the poster↔video swap, and the fountain's static↔flowing state.
-- **`DashboardScene`** — owns the `SCNScene`: procedural skyscrapers (window-grid textures, floor ledges, corner trim, rooftop props), a stone-pavement ground plane, the fountain particle system, and `setTimeOfDay(_:)` for the Day/Afternoon/Night lighting + sky presets.
-- **`DashboardPanelView`** — the actual functional UI (ingest controls, question field, cited answer list), composited on top of the 3D scene and leaned in 3D to match the `dashboardNode`.
+- **`MainScene`** — hosts the analytics dashboard with chart cycling, zoom controls, and navigation triggering the transition to seasonal 3D weather scenes upon tapping individual chart outputs.
+- **`OfficeBuilder`** — constructs the 3D office interior scene.
+- **`DashboardPanelView`** — the actual functional UI (ingest controls, question field, cited answer list), composited against the backend API endpoints.
 - **`APIClient`** — thin async/await wrapper matching `index.js`'s exact response shapes; no guessed fields.
-- **`HomeContactView`** — Home/Connect circles opening sheets with LinkedIn, Vimeo, and GitHub slug links.
+- **`Models` & `SeasonScene`** — configure season enum configurations, tasks, color palettes, chart models, and wrapper views for Winter (snow & robotic street snow remover), Spring (rain & robotic flower-pouring), Summer (wind & robotic lawn-design), and Autumn (flowing leaves & robotic fruit-sorting).
 
 ### Node.js backend — ai-application-layer
 
@@ -172,18 +170,18 @@ the SwiftUI app only ever sees the final `answer`/`sources` JSON.
 ```
 .
 ├── AIApplicationLayerApp/
-│   ├── AIApplicationLayerApp.swift   # @main App entry point
-│   ├── ContentView.swift             # 3D scene host + dashboard/poster/fountain composition
-│   ├── DashboardScene.swift          # SceneKit scene: skyline, ground, fountain, day/night lighting
-│   ├── DashboardPanelView.swift      # Ingest + Ask UI, wired to APIClient
-│   ├── APIClient.swift               # async/await client for /api/health, /api/ingest, /api/query
-│   ├── MotionManager.swift           # CoreMotion tilt → leanAngle / isMoving
-│   ├── PosterVideoBillboard.swift    # Poster ⇄ looping muted Vimeo video swap
-│   └── HomeContactView.swift         # Home/Connect circles → LinkedIn/Vimeo/GitHub slugs
+│   ├── AILayerApp.swift                # @main App entry point
+│   ├── MainScene.swift                 # Analytics Dashboard host view with chart selection and navigation
+│   ├── Models.swift                    # Season enum configurations, tasks, color palettes, and Chart models
+│   ├── OfficeBuilder.swift             # SceneKit 3D environment & workstation builder
+│   ├── SceneHelpers.swift              # Material generation and lighting setup helpers
+│   ├── SeasonScene.swift               # Season-specific SceneContainer wrapper and views
+│   ├── DashboardPanelView.swift        # Ingest + Ask UI, wired to APIClient
+│   └── APIClient.swift                 # async/await client for /api/health, /api/ingest, /api/query
 └── README.md
 ```
 
-Backend repository (consumed, not vendored — see [ai-application-layer](https://github.com/techplanshetyapps/ai-application-layer)):
+Backend repository (consumed, not vendored — see [ai-application-layer](https://github.com/saasmodularframework/ai-application-layer-extended)):
 
 ```
 .
@@ -194,9 +192,7 @@ Backend repository (consumed, not vendored — see [ai-application-layer](https:
 │   └── gemma.js              # ai-sdk Gemma generation + embeddings
 ├── public/index.html        # Web dashboard UI (the SwiftUI app's sibling frontend)
 ├── vercel.json               # Vercel deployment routing
-├── .env.example
-├── KAGGLE_WRITEUP.md
-└── DEVPOST.md
+└── .env
 ```
 
 ---
@@ -205,20 +201,21 @@ Backend repository (consumed, not vendored — see [ai-application-layer](https:
 
 | Feature | Notes |
 |---|---|
-| 3D skyline, dashboard panel, fountain (SceneKit) | Procedural window-grid textures, floor ledge bands, corner trim pillars, rooftop setback tiers, rooftop props (antenna, AC units, water tanks); ground plane is a tiled procedural stone-pavement texture |
-| Day / Afternoon / Night control | Segmented picker calls `DashboardScene.setTimeOfDay(_:)` — swaps sky color, key/ambient/rim lighting, and building window glow |
-| Motion-driven lean/parallax | `MotionManager.leanAngle` rotates the dashboard panel and pans the camera as the tablet tilts left/right |
-| Poster ⇄ looping muted video | `PosterVideoBillboard` swaps to a muted, looping `WKWebView` Vimeo embed while `isMoving`, reverts to a poster placeholder at rest |
-| Fountain static ⇄ flowing | Same `isMoving` signal toggles the fountain's `SCNParticleSystem` birth rate |
-| Home / Connect circles | Open sheets with LinkedIn, Vimeo, and GitHub slug links; full-row tappable |
-| Ingest + Ask Gemma | `DashboardPanelView` mirrors `public/index.html`'s functionality against the real `/api/ingest` and `/api/query` endpoints |
+| 3D office interior & workstations (SceneKit) | 
+| Interactive chart zoom & navigation | Swipe gestures or button controls to cycle through Marimekko, Dendrogram, Stream graph, and Radial bars notebook charts with smooth zooming |
+| Four seasonal 3D nature weather scenes | Seasonal destinations accessible by tapping individual chart outputs from the main dashboard scene |
+| Winter weather scene | Winter weather featuring realistic snowfall and a robotic street snow remover performing seasonal maintenance |
+| Spring weather scene | Spring season featuring falling rain and a robotic arm pouring water on flowers |
+| Summer weather scene | Summer environment featuring gentle wind currents and a robotic gardener designing and tending lawns |
+| Autumn weather scene | Autumn setting featuring flowing leaves and a robotic sorting mechanism separating fruit by size, shape, color, and weight |
+| Ingest + Ask Gemma | `DashboardPanelView` mirrors web functionality against the real `/api/ingest` and `/api/query` backend endpoints |
 
 ---
 
 ## Setup and build (.ipa via Apple Configurator)
 
 1. Open Xcode (15.2) → **File → New → Project → iOS App**, SwiftUI interface, a clean product name (no punctuation).
-2. Drag in all `.swift` files from `AIApplicationLayerApp/`, checking **Copy items if needed** and the app target's membership checkbox.
+2. Drag in all `.swift` files from `rag-application-layer-extended/`, checking **Copy items if needed** and the app target's membership checkbox.
 3. **Signing & Capabilities** → select your Apple Developer team.
 4. **Info.plist** → confirm `NSMotionUsageDescription` is set (CoreMotion requires it).
 5. Build and test on a physical iPad — CoreMotion tilt doesn't work in the Simulator.

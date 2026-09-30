@@ -37,8 +37,8 @@ enum SeasonBuilder {
         case .summer: p.birthRate = 150; p.particleSize = 0.06; p.particleColor = UIColor(white: 1, alpha: 0.6)
                       p.acceleration = SCNVector3(12, 0, 0); p.stretchFactor = 0.6; p.particleLifeSpan = 3
         case .autumn: p.birthRate = 120; p.particleSize = 0.18; p.particleColor = .orange; p.acceleration = SCNVector3(1.5, -1.0, 0.5)
-                      p.particleColorVariation = SCNVector4(0.1, 0.4, 0.1, 0); p.rotationAngularVelocity = 4; p.particleAngleVariation = 180
-        }
+                              p.particleColorVariation = SCNVector4(0.1, 0.4, 0.1, 0); p.particleAngularVelocity = 4; p.particleAngleVariation = 180
+                }
         let n = SCNNode(); n.position = SCNVector3(0, 14, -5); n.addParticleSystem(p); return n
     }
     static func makeRobot() -> SCNNode {

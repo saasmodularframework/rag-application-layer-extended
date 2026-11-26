@@ -1,4 +1,4 @@
-# AI Application Layer — SwiftUI Smart Supply Chain Optimization Dashboard
+# AI Application Layer — SwiftUI Smart Supply Chain Optimization Dashboard 
 
 A SwiftUI + SceneKit iPad client for the **ai-application-layer** Gemma RAG
 backend, staged as an interactive 3D Smart Supply Chain Optimization Dashboard — motion-tilt parallax,
